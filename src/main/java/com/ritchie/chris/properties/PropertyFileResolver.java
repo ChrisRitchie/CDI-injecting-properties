@@ -12,24 +12,28 @@ import javax.ejb.Singleton;
 
 @Singleton
 public class PropertyFileResolver {
-    
-    Map<String, String> properties = new HashMap<>();
-    
+     
+    private Map<String, String> properties = new HashMap<>();
+     
     @PostConstruct
     private void init() throws IOException {
-        
-        //lookup our property file location, as defined in the system-properties element in WildFly
-        String propertyFile = System.getProperty("application.property");
+         
+        //matches the property name as defined in the system-properties element in WildFly
+        String propertyFile = System.getProperty("application.properties");
         File file = new File(propertyFile);
         Properties properties = new Properties();
-        properties.load(new FileInputStream(file));
-        
-        properties.putAll(new HashMap<>(properties));
-
+         
+        try {
+            properties.load(new FileInputStream(file));
+        } catch (IOException e) {
+            System.out.println("Unable to load properties file" + e);
+        }
+         
+        HashMap hashMap = new HashMap<>(properties);
+        this.properties.putAll(hashMap);
     }
-
+ 
     public String getProperty(String key) {
         return properties.get(key);
     }
-    
 }
